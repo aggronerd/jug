@@ -45,6 +45,7 @@ def select(jugdir):
     if type(jugdir) != str:
         return jugdir
     if jugdir.startswith('redis:'):
+       print("Using redis")
        return redis_store.redis_store(jugdir)
     if jugdir == 'dict_store':
         return dict_store()

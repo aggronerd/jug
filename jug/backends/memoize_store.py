@@ -106,6 +106,7 @@ class cache_lock(object):
     '''
 
     def __init__(self, base, name, locks):
+        print("cache_lock:init locks=" + str(locks))
         self.base = base.getlock(name)
         self.status = _UNKNOWN
         if locks is not None:
@@ -130,7 +131,10 @@ class cache_lock(object):
         '''
         locked = lock.is_locked()
         '''
+        print("cache_lock:is_locked status=" + str(self.status))
         if self.status == _UNKNOWN:
+            print("cache_lock: is locked unknown")
             self.status = (_LOCKED if self.base.is_locked() else _NOT_LOCKED)
+        print("cache_lock:is_locked status=" + str(self.status))
         return self.status
 

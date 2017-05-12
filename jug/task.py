@@ -337,8 +337,12 @@ tricky to support since the general code relies on the function name)''')
         lock : create lock
         unlock : destroy lock
         '''
+        print("Task:is_locked")
         if not hasattr(self, '_lock'):
+            print("Task:is_locked does not have _lock attribute")
             self._lock = self.store.getlock(self.hash())
+        print("Task:is_locked self._lock = " + str(self._lock))
+        print("Task:is_locked lock " + str(self._lock.is_locked()))
         return self._lock.is_locked()
 
 class Tasklet(TaskletMixin):

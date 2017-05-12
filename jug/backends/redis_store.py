@@ -71,6 +71,7 @@ class redis_store(base_store):
                 redis_params['port'] = int( redis_params['port'] )
         logging.info('connecting to %s' % redis_params)
 
+        print("intializing redist store with " + str(redis_params))
         self.redis = redis.Redis(**redis_params)
 
 
@@ -130,23 +131,28 @@ class redis_store(base_store):
             self.redis.delete(_resultname(superflous))
 
     def remove_locks(self):
+        print("redis:remove_locks")
         locks = self.redis.keys('lock:*')
         for lk in locks:
             self.redis.delete(lk)
         return len(locks)
 
     def list(self):
+        print("redis:list")
         existing = self.redis.keys('result:*')
         for ex in existing:
             yield ex[len('result:'):]
 
     def listlocks(self):
+        print("redis:listlocks")
         locks = self.redis.keys('lock:*')
         for lk in locks:
-            yield lk[len('lock:')]
+            print("redis:found lock " + str(lk) + " result " + str(lk[len('lock:')]))
+            yield lk[len('lock:'):]
 
 
     def getlock(self, name):
+        print("redis:getlock(" + str(name) + ")")
         return redis_lock(self.redis, name)
 
 
@@ -175,12 +181,14 @@ class redis_lock(base_lock):
     def __init__(self, redis, name):
         self.name = _lockname(name)
         self.redis = redis
+        print("redis_lock:init")
 
 
     def get(self):
         '''
         lock.get()
         '''
+        print("redis_lock:get " + str(self.name))
         previous = self.redis.getset(self.name, _LOCKED)
         return (previous is None)
 
@@ -191,6 +199,7 @@ class redis_lock(base_lock):
 
         Removes lock
         '''
+        print("redis_lock:release " + str(self.name))
         self.redis.delete(self.name)
 
 
@@ -198,6 +207,9 @@ class redis_lock(base_lock):
         '''
         locked = lock.is_locked()
         '''
+        print("redis_lock:is_locked")
         status = self.redis.get(self.name)
+        print("redis_lock:is_locked " + str(status))
+        print("redis_lock:is_locked " + str(status == _LOCKED))
         return status is not None and status == _LOCKED
 
